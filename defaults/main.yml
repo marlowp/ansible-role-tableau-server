@@ -1,0 +1,39 @@
+---
+
+temp_files_dir: /tmp/tableau-installer-files/
+
+tsm_admin_user: tableau
+tsm_admin_pass: QkjhXoZpsaw01JJ23
+tsm_admin_salt: qwertyuiop
+tsm_admin_group: tableau
+
+tableau_server_admin_user: admin
+tableau_server_admin_pass: changeme
+
+registration_details_zip: ""
+registration_details_country: ""
+registration_details_city: ""
+registration_details_last_name: ""
+registration_details_industry: ""
+registration_details_eula: ""
+registration_details_title: ""
+registration_details_phone: ""
+registration_details_company: ""
+registration_details_state: ""
+registration_details_department: ""
+registration_details_first_name: ""
+registration_details_email: ""
+
+installer_version_major: 2018
+installer_version_minor: 1
+installer_version_patch: 1
+installer_deb_package: tableau-server-{{ installer_version_major }}-{{ installer_version_minor }}-{{ installer_version_patch }}_amd64.deb
+installer_deb_url: https://downloads.tableau.com/esdalt/{{ installer_version_major }}.{{ installer_version_minor }}.{{ installer_version_patch }}/{{ installer_deb_package }}
+installer_install_directory: /var/opt/tableau/tableau_server
+
+automated_installer_version_major: 2018
+automated_installer_version_minor: 1
+automated_installer_deb_package: tableau-server-automated-installer-{{ automated_installer_version_major }}-{{ automated_installer_version_minor }}_all.deb
+automated_installer_deb_url: https://github.com/tableau/server-install-script-samples/raw/master/linux/automated-installer/packages/{{ automated_installer_deb_package }}
+automated_installer_install_directory: /opt/tableau/tableau_server_automated_installer
+automated_installer_args: "-a {{ tsm_admin_user }} -s {{ temp_files_dir }}secrets.txt -f {{ temp_files_dir }}config.json -r {{ temp_files_dir }}reg_templ.json --accepteula {{ temp_files_dir }}{{ installer_deb_package }}"

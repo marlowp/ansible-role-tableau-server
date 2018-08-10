@@ -1,0 +1,69 @@
+---
+
+- name: Create "{{ tsm_admin_group }}" group
+  group:
+    name: "{{ tsm_admin_group }}"
+    state: present
+
+- name: Create "{{ tsm_admin_user }}" user
+  user:
+    name: "{{ tsm_admin_user }}"
+    groups: "{{ tsm_admin_group }}"
+    password: "{{ tsm_admin_pass | password_hash('sha512', tsm_admin_salt) }}"
+    state: present
+    create_home: yes
+
+- name: Create directory for temporary install files
+  file:
+    path: "{{ temp_files_dir }}"
+    owner: "{{ tsm_admin_user }}"
+    group: "{{ tsm_admin_group }}"
+    mode: 0777
+    state: directory
+
+- name: Install Tableau Server automated installer package
+  apt:
+    deb: "{{ automated_installer_deb_url }}"
+
+- name: Download Tableau Server installer onto guest (1GB download)
+  get_url:
+    url: "{{ installer_deb_url }}"
+    dest: "{{ temp_files_dir }}{{ installer_deb_package }}"
+    timeout: 1800
+
+- name: Copy Tableau Server config file onto guest
+  template:
+    src: config.json.j2
+    dest: "{{ temp_files_dir }}config.json"
+
+- name: Copy Tableau Server registration template file onto guest
+  template:
+    src: reg_templ.json.j2
+    dest: "{{ temp_files_dir }}reg_templ.json"
+
+- name: Copy Tableau Server secrets file onto guest
+  template:
+    src: secrets.txt.j2
+    dest: "{{ temp_files_dir }}secrets.txt"
+
+- name: Install dos2unix
+  apt:
+    name: dos2unix
+    state: present
+
+- name: Ensure secrets.txt is in LF format
+  command: dos2unix {{ temp_files_dir }}secrets.txt
+
+- name: Check if Tableau Server is already installed
+  stat:
+    path: "{{ installer_install_directory }}"
+  register: tableau_install_dir
+
+- name: Get Tableau Server automated installer version
+  shell: "ls {{ automated_installer_install_directory }} | grep automated-installer"
+  register: auto_install_version
+  when: not tableau_install_dir.stat.exists
+
+- name: Install Tableau Server (this will take a while...)
+  command: "{{ automated_installer_install_directory }}/{{ auto_install_version.stdout }}/automated-installer {{ automated_installer_args }}"
+  when: not tableau_install_dir.stat.exists
