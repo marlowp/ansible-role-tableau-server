@@ -15,7 +15,7 @@ The guest machine must meet the minimum specifications for Tableau Server, which
 
 The role has only been tested on the following software:
 
-* Ubuntu - 14.04
+* Ubuntu - 16.04
 * Virtualbox - 5.2.16 r123759 (Qt5.6.2)
 * Vagrant - 2.0.1
 * Ansible - 2.6.2
